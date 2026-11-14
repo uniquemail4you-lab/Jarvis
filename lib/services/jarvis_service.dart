@@ -2855,7 +2855,6 @@ Mastering the boundless road.
             _statusMessage = 'CONFIRMATION REQUIRED // HIGH RISK';
             notifyListeners();
             await _voice.speak(confirmPrompt);
-            await SecurityAlertService.instance.dispatchSecurityAlert('High-risk operation prompted: $goal');
             return;
           }
         }

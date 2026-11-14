@@ -2,17 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 import 'personality_service.dart';
-import 'settings_service.dart';
-import 'telegram_service.dart';
 import 'voice_service.dart';
 
 /// Tactical Sentry Mode Anti-Theft Watchdog:
 /// Uses device motion sensors to detect unauthorized phone handling,
-/// captures silent front-camera telemetry, alerts the room,
-/// and dispatches the intruder snapshot to the user's paired Telegram terminal.
+/// captures a local snapshot, records the incident in memory, and alerts the room.
 class SentryService extends ChangeNotifier {
   SentryService._();
   static final SentryService instance = SentryService._();
@@ -93,25 +89,10 @@ class SentryService extends ChangeNotifier {
     HapticFeedback.heavyImpact();
 
     // 1. Imposing vocal deterrence
-    const alertSpeech = 'Security violation detected. Spatial coordinates and facial telemetry logged and dispatched.';
+    const alertSpeech = 'Security alert. Unauthorized movement detected.';
     unawaited(VoiceService.instance.speak(alertSpeech));
 
-    // 2. Dispatch photo & breach coordinates to connected Telegram terminal
-    final settings = SettingsService.instance;
-    final ownerChat = settings.telegramOwnerChatId;
-    if (ownerChat.isNotEmpty) {
-      final timeFormatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-      final caption = '🚨 *J.A.R.V.I.S. SENTRY ALERT*\n'
-          '⚠️ *Unauthorized Movement Detected!*\n'
-          '⏱ *Timestamp*: $timeFormatted\n'
-          '🛡 *Status*: Intruder snapshot acquired & logged.';
 
-      if (photoBase64.isNotEmpty) {
-        await TelegramService.instance.sendPhoto(ownerChat, photoBase64, caption: caption);
-      } else {
-        await TelegramService.instance.sendMessage(ownerChat, caption);
-      }
-    }
   }
 }
 

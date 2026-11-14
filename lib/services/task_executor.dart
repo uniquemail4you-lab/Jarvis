@@ -59,9 +59,8 @@ class TaskExecutor extends ChangeNotifier {
   bool get isPaused => state == ExecutorState.paused;
   bool get isBusy => state != ExecutorState.idle;
 
-  /// Called when a task finishes so external integrations (Telegram) can
+  /// Called when a task finishes.
   /// push results back to the originating chat.
-  void Function(String chatId, TaskHistoryEntry entry)? onTaskFinished;
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -268,9 +267,8 @@ class TaskExecutor extends ChangeNotifier {
   // Main loop
   // ------------------------------------------------------------------
 
-  /// Executes [goal]. When [telegramChatId] is set, completion (with a
-  /// screenshot) is reported back through [onTaskFinished].
-  Future<TaskStatus> executeTask(String goal, {String? telegramChatId}) async {
+  /// Executes [goal] locally and records its completion in local history.
+  Future<TaskStatus> executeTask(String goal) async {
     if (isBusy) {
       _log(ChatMessage.error('Another task is already running.'));
       return TaskStatus.failed;
@@ -340,7 +338,7 @@ class TaskExecutor extends ChangeNotifier {
       status = TaskStatus.failed;
       return status;
     } finally {
-      await _finalize(goal, status, telegramChatId);
+      await _finalize(goal, status);
     }
   }
 
@@ -606,7 +604,6 @@ class TaskExecutor extends ChangeNotifier {
   Future<void> _finalize(
     String goal,
     TaskStatus status,
-    String? telegramChatId,
   ) async {
     final entry = TaskHistoryEntry(
       goal: goal,
@@ -637,9 +634,6 @@ class TaskExecutor extends ChangeNotifier {
       '$goal\n$summary',
     );
 
-    if (telegramChatId != null) {
-      onTaskFinished?.call(telegramChatId, entry);
-    }
 
     state = ExecutorState.idle;
     currentGoal = null;

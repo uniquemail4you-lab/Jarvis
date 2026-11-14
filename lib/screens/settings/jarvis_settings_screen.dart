@@ -735,8 +735,6 @@ class _JarvisSettingsScreenState extends State<JarvisSettingsScreen> {
   Widget _sentryCard(ThemeData theme) {
     final sentry = SentryService.instance;
     final isArmed = sentry.isArmed;
-    final ownerChat = _settings.telegramOwnerChatId;
-    final hasTelegram = ownerChat.isNotEmpty;
 
     return Card(
       elevation: 0,
@@ -811,7 +809,7 @@ class _JarvisSettingsScreenState extends State<JarvisSettingsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Armed watchdog detects unauthorized handling, speaks an imposing security warning, captures a silent front-camera snapshot, and immediately transmits the photo to your paired Telegram terminal.',
+              'Armed watchdog detects unauthorized handling, triggers a local voice warning and vibration, and captures a front-camera snapshot kept in app memory.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 height: 1.4,
@@ -821,32 +819,22 @@ class _JarvisSettingsScreenState extends State<JarvisSettingsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: hasTelegram
-                    ? Colors.green.withValues(alpha: 0.1)
-                    : Colors.amber.withValues(alpha: 0.1),
+                color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: hasTelegram
-                      ? Colors.green.withValues(alpha: 0.3)
-                      : Colors.amber.withValues(alpha: 0.4),
+                  color: Colors.green.withValues(alpha: 0.3),
                 ),
               ),
-              child: Row(
+              child: const Row(
                 children: [
-                  Icon(
-                    hasTelegram ? Icons.telegram : Icons.warning_amber_rounded,
-                    color: hasTelegram ? Colors.greenAccent : Colors.amber,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
+                  Icon(Icons.privacy_tip_outlined, color: Colors.greenAccent, size: 16),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      hasTelegram
-                          ? 'Telegram Uplink: Connected (Chat ID: $ownerChat)'
-                          : 'Telegram Uplink: Not paired. Configure in Settings for photo dispatch.',
+                      'Local Protection: No Telegram photo transmission',
                       style: TextStyle(
                         fontSize: 11,
-                        color: hasTelegram ? Colors.greenAccent : Colors.amber,
+                        color: Colors.greenAccent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
